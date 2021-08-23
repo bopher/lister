@@ -58,7 +58,7 @@ func JsonStringResolver(lister Lister, data interface{}) bool {
 // FiberFormResolver parse parameters from fiber context
 func FiberFormResolver(lister Lister, data interface{}) bool {
 	if ctx, ok := data.(*fiber.Ctx); ok {
-		record := new(ListerRequest)
+		record := ListerRequest{}
 		if err := ctx.BodyParser(&record); err == nil {
 			return ListerRecordResolver(lister, record)
 		}

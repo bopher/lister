@@ -12,13 +12,13 @@ type Lister interface {
 	// GetPage get current page
 	GetPage() uint
 	// SetValidLimits set valid limits list
-	SetValidLimits(limits ...uint8)
+	SetValidLimits(limits ...uint)
 	// GetValidLimits get valid limits
-	GetValidLimits() []uint8
+	GetValidLimits() []uint
 	// SetLimit set limit
-	SetLimit(limit uint8)
+	SetLimit(limit uint)
 	// GetLimit get limit
-	GetLimit() uint8
+	GetLimit() uint
 	// SetValidSorts set valid sorts list
 	SetValidSorts(sorts ...string)
 	// GetValidSort get valid sorts

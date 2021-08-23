@@ -95,7 +95,7 @@ Set valid limits list.
 
 ```go
 // Signature:
-SetValidLimits(limits ...uint8)
+SetValidLimits(limits ...uint)
 ```
 
 ### GetValidLimits
@@ -104,7 +104,7 @@ Get valid limits.
 
 ```go
 // Signature:
-GetValidLimits() []uint8
+GetValidLimits() []uint
 ```
 
 ### SetLimit
@@ -113,7 +113,7 @@ Set limit.
 
 ```go
 // Signature:
-SetLimit(limit uint8)
+SetLimit(limit uint)
 ```
 
 ### GetLimit
@@ -122,7 +122,7 @@ Get limit.
 
 ```go
 // Signature:
-GetLimit() uint8
+GetLimit() uint
 ```
 
 ### SetValidSorts

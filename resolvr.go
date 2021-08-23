@@ -9,7 +9,7 @@ import (
 
 type ListerRequest struct {
 	Page    uint                   `json:"page" form:"page" xml:"page"`
-	Limit   uint8                  `json:"limit" form:"limit" xml:"limit"`
+	Limit   uint                   `json:"limit" form:"limit" xml:"limit"`
 	Sort    string                 `json:"sort" form:"sort" xml:"sort"`
 	Order   string                 `json:"order" form:"order" xml:"order"`
 	Search  string                 `json:"search" form:"search" xml:"search"`

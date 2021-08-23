@@ -8,14 +8,14 @@ import (
 // lister driver
 type lister struct {
 	page    uint
-	limit   uint8
+	limit   uint
 	sort    string
 	order   string
 	search  string
 	filters map[string]interface{}
 
 	resolver RequestResolver
-	limits   []uint8
+	limits   []uint
 	sorts    []string
 	meta     map[string]interface{}
 
@@ -33,7 +33,7 @@ func (l *lister) init() {
 	l.order = "asc"
 	l.filters = make(map[string]interface{})
 	l.resolver = FiberFormResolver
-	l.limits = []uint8{10, 25, 50, 100, 250}
+	l.limits = []uint{10, 25, 50, 100, 250}
 	l.sorts = []string{"id"}
 	l.meta = make(map[string]interface{})
 }
@@ -67,19 +67,19 @@ func (l *lister) GetPage() uint {
 }
 
 // SetValidLimits set valid limits list
-func (l *lister) SetValidLimits(limits ...uint8) {
+func (l *lister) SetValidLimits(limits ...uint) {
 	if len(limits) > 0 {
 		l.limits = limits
 	}
 }
 
 // GetValidLimits get valid limits
-func (l *lister) GetValidLimits() []uint8 {
+func (l *lister) GetValidLimits() []uint {
 	return l.limits
 }
 
 // SetLimit set limit
-func (l *lister) SetLimit(limit uint8) {
+func (l *lister) SetLimit(limit uint) {
 	for _, lmt := range l.limits {
 		if lmt == limit {
 			l.limit = limit
@@ -88,7 +88,7 @@ func (l *lister) SetLimit(limit uint8) {
 }
 
 // GetLimit get limit
-func (l *lister) GetLimit() uint8 {
+func (l *lister) GetLimit() uint {
 	return l.limit
 }
 

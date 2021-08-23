@@ -436,7 +436,9 @@ func (l *lister) Response() map[string]interface{} {
 	}
 	res["page"] = l.page
 	res["limit"] = l.limit
+	res["validLimits"] = l.limits
 	res["sort"] = l.sort
+	res["validSorts"] = l.sorts
 	res["order"] = l.order
 	res["search"] = l.search
 	res["total"] = l.total
@@ -454,7 +456,9 @@ func (l *lister) ResponseWithData(data interface{}) map[string]interface{} {
 	}
 	res["page"] = l.page
 	res["limit"] = l.limit
+	res["validLimits"] = l.limits
 	res["sort"] = l.sort
+	res["validSorts"] = l.sorts
 	res["order"] = l.order
 	res["search"] = l.search
 	res["total"] = l.total

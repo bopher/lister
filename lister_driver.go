@@ -14,10 +14,9 @@ type lister struct {
 	search  string
 	filters map[string]interface{}
 
-	resolver RequestResolver
-	limits   []uint
-	sorts    []string
-	meta     map[string]interface{}
+	limits []uint
+	sorts  []string
+	meta   map[string]interface{}
 
 	total      uint64
 	from       uint64
@@ -32,22 +31,9 @@ func (l *lister) init() {
 	l.sort = "id"
 	l.order = "asc"
 	l.filters = make(map[string]interface{})
-	l.resolver = FiberFormResolver
 	l.limits = []uint{10, 25, 50, 100, 250}
 	l.sorts = []string{"id"}
 	l.meta = make(map[string]interface{})
-}
-
-// SetResolver set request resolver function
-func (l *lister) SetResolver(resolver RequestResolver) {
-	if resolver != nil {
-		l.resolver = resolver
-	}
-}
-
-// Parse parse request using registered resolver
-func (l *lister) Parse(data interface{}) bool {
-	return l.resolver(l, data)
 }
 
 // SetPage set current page
@@ -209,9 +195,15 @@ func (l *lister) StringFilter(key string, fallback string) (string, bool) {
 
 // StringSliceFilter get string slice filter or return fallback if filter not exists
 func (l *lister) StringSliceFilter(key string, fallback []string) ([]string, bool) {
-	if val, ok := l.filters[key]; ok {
-		if strVal, ok := val.([]string); ok {
-			return strVal, true
+	if slice, ok := l.SliceFilter(key, nil); ok {
+		var res []string
+		for _, s := range slice {
+			if v, ok := s.(string); ok {
+				res = append(res, v)
+			}
+		}
+		if len(res) > 0 {
+			return res, true
 		}
 	}
 	return fallback, false
@@ -229,9 +221,15 @@ func (l *lister) BoolFilter(key string, fallback bool) (bool, bool) {
 
 // BoolSliceFilter get bool slice filter or return fallback if filter not exists
 func (l *lister) BoolSliceFilter(key string, fallback []bool) ([]bool, bool) {
-	if val, ok := l.filters[key]; ok {
-		if boolVal, ok := val.([]bool); ok {
-			return boolVal, true
+	if slice, ok := l.SliceFilter(key, nil); ok {
+		var res []bool
+		for _, s := range slice {
+			if v, ok := s.(bool); ok {
+				res = append(res, v)
+			}
+		}
+		if len(res) > 0 {
+			return res, true
 		}
 	}
 	return fallback, false
@@ -249,9 +247,15 @@ func (l *lister) Float64Filter(key string, fallback float64) (float64, bool) {
 
 // Float64SliceFilter get float64 slice filter or return fallback if filter not exists
 func (l *lister) Float64SliceFilter(key string, fallback []float64) ([]float64, bool) {
-	if val, ok := l.filters[key]; ok {
-		if floatVal, ok := val.([]float64); ok {
-			return floatVal, true
+	if slice, ok := l.SliceFilter(key, nil); ok {
+		var res []float64
+		for _, s := range slice {
+			if v, ok := s.(float64); ok {
+				res = append(res, v)
+			}
+		}
+		if len(res) > 0 {
+			return res, true
 		}
 	}
 	return fallback, false
@@ -269,9 +273,15 @@ func (l *lister) Int64Filter(key string, fallback int64) (int64, bool) {
 
 // Int64SliceFilter get int64 slice filter or return fallback if filter not exists
 func (l *lister) Int64SliceFilter(key string, fallback []int64) ([]int64, bool) {
-	if val, ok := l.filters[key]; ok {
-		if intVal, ok := val.([]int64); ok {
-			return intVal, true
+	if slice, ok := l.SliceFilter(key, nil); ok {
+		var res []int64
+		for _, s := range slice {
+			if v, ok := s.(int64); ok {
+				res = append(res, v)
+			}
+		}
+		if len(res) > 0 {
+			return res, true
 		}
 	}
 	return fallback, false
@@ -315,9 +325,15 @@ func (l *lister) StringMeta(key string, fallback string) (string, bool) {
 
 // StringSliceMeta get string slice slice meta or return fallback if meta not exists
 func (l *lister) StringSliceMeta(key string, fallback []string) ([]string, bool) {
-	if val, ok := l.meta[key]; ok {
-		if strVal, ok := val.([]string); ok {
-			return strVal, true
+	if slice, ok := l.SliceMeta(key, nil); ok {
+		var res []string
+		for _, s := range slice {
+			if v, ok := s.(string); ok {
+				res = append(res, v)
+			}
+		}
+		if len(res) > 0 {
+			return res, true
 		}
 	}
 	return fallback, false
@@ -335,9 +351,15 @@ func (l *lister) BoolMeta(key string, fallback bool) (bool, bool) {
 
 // BoolSliceMeta get bool slice meta or return fallback if meta not exists
 func (l *lister) BoolSliceMeta(key string, fallback []bool) ([]bool, bool) {
-	if val, ok := l.meta[key]; ok {
-		if boolVal, ok := val.([]bool); ok {
-			return boolVal, true
+	if slice, ok := l.SliceMeta(key, nil); ok {
+		var res []bool
+		for _, s := range slice {
+			if v, ok := s.(bool); ok {
+				res = append(res, v)
+			}
+		}
+		if len(res) > 0 {
+			return res, true
 		}
 	}
 	return fallback, false
@@ -355,9 +377,15 @@ func (l *lister) Float64Meta(key string, fallback float64) (float64, bool) {
 
 // Float64SliceMeta get float64 slice meta or return fallback if meta not exists
 func (l *lister) Float64SliceMeta(key string, fallback []float64) ([]float64, bool) {
-	if val, ok := l.meta[key]; ok {
-		if floatVal, ok := val.([]float64); ok {
-			return floatVal, true
+	if slice, ok := l.SliceMeta(key, nil); ok {
+		var res []float64
+		for _, s := range slice {
+			if v, ok := s.(float64); ok {
+				res = append(res, v)
+			}
+		}
+		if len(res) > 0 {
+			return res, true
 		}
 	}
 	return fallback, false
@@ -375,9 +403,15 @@ func (l *lister) Int64Meta(key string, fallback int64) (int64, bool) {
 
 // Int64SliceMeta get int64 slice meta or return fallback if meta not exists
 func (l *lister) Int64SliceMeta(key string, fallback []int64) ([]int64, bool) {
-	if val, ok := l.meta[key]; ok {
-		if intVal, ok := val.([]int64); ok {
-			return intVal, true
+	if slice, ok := l.SliceMeta(key, nil); ok {
+		var res []int64
+		for _, s := range slice {
+			if v, ok := s.(int64); ok {
+				res = append(res, v)
+			}
+		}
+		if len(res) > 0 {
+			return res, true
 		}
 	}
 	return fallback, false
@@ -436,9 +470,7 @@ func (l *lister) Response() map[string]interface{} {
 	}
 	res["page"] = l.page
 	res["limit"] = l.limit
-	res["validLimits"] = l.limits
 	res["sort"] = l.sort
-	res["validSorts"] = l.sorts
 	res["order"] = l.order
 	res["search"] = l.search
 	res["total"] = l.total
@@ -456,9 +488,7 @@ func (l *lister) ResponseWithData(data interface{}) map[string]interface{} {
 	}
 	res["page"] = l.page
 	res["limit"] = l.limit
-	res["validLimits"] = l.limits
 	res["sort"] = l.sort
-	res["validSorts"] = l.sorts
 	res["order"] = l.order
 	res["search"] = l.search
 	res["total"] = l.total

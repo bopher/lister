@@ -29,7 +29,8 @@ Request resolver is a function that parse lister fields from request (string, fo
     "search": "john",
     "filters": {
         "minAge": 25,
-        "gender": "female"
+        "gender": "female",
+        "permissions": ["acc", "report"]
     }
 }
 ```
@@ -40,10 +41,9 @@ Request resolver is a function that parse lister fields from request (string, fo
 import "github.com/bopher/lister"
 import "fmt"
 lst := lister.New()
-lst.SetResolver(lister.JsonStringResolver)
 lst.SetValidLimits(10, 25, 50, 100)
 lst.SetValidSorts("id", "name", "last_activity")
-lst.Parse(`{"page": 2, "limit": 10}`)
+lister.JsonStringResolver(lst,`{"page": 2, "limit": 10}`)
 lst.SetTotal(/* Get Total Record Count From Somewhere */)
 // Do other operations, paginate and fetch record
 fmt.Println(lst.ResponseWithData(myData))
@@ -52,24 +52,6 @@ fmt.Println(lst.ResponseWithData(myData))
 ## Usage
 
 Lister interface contains following methods:
-
-### SetResolver
-
-Set request resolver function.
-
-```go
-// Signature:
-SetResolver(resolver RequestResolver)
-```
-
-### Parse
-
-Parse request using registered resolver.
-
-```go
-// Signature:
-Parse(data interface{}) bool
-```
 
 ### SetPage
 

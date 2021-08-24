@@ -3,10 +3,6 @@ package lister
 // Lister interface
 // this interface helps parsing list request and generating paginator information
 type Lister interface {
-	// SetResolver set request resolver function
-	SetResolver(resolver RequestResolver)
-	// Parse parse request using registered resolver
-	Parse(data interface{}) bool
 	// SetPage set current page
 	SetPage(page uint)
 	// GetPage get current page

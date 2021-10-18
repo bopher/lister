@@ -28,11 +28,11 @@ type lister struct {
 func (l *lister) init() {
 	l.page = 1
 	l.limit = 25
-	l.sort = "id"
+	l.sort = "_id"
 	l.order = "asc"
 	l.filters = make(map[string]interface{})
 	l.limits = []uint{10, 25, 50, 100, 250}
-	l.sorts = []string{"id"}
+	l.sorts = []string{"_id"}
 	l.meta = make(map[string]interface{})
 }
 

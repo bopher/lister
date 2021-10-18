@@ -42,7 +42,7 @@ import "github.com/bopher/lister"
 import "fmt"
 lst := lister.New()
 lst.SetValidLimits(10, 25, 50, 100)
-lst.SetValidSorts("id", "name", "last_activity")
+lst.SetValidSorts("_id", "name", "last_activity")
 lister.JsonStringResolver(lst,`{"page": 2, "limit": 10}`)
 lst.SetTotal(/* Get Total Record Count From Somewhere */)
 // Do other operations, paginate and fetch record

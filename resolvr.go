@@ -36,7 +36,7 @@ func ListerRecordResolver(lister Lister, data interface{}) bool {
 // Base64Resolver parse data from base64 encoded json string
 func Base64Resolver(lister Lister, data interface{}) bool {
 	if qs, ok := data.(string); ok {
-		var base64decoded []byte
+		base64decoded := make([]byte, base64.StdEncoding.EncodedLen(len(qs)))
 		if _, err := base64.StdEncoding.Decode(base64decoded, []byte(qs)); err == nil {
 			return JsonStringResolver(lister, string(base64decoded))
 		}

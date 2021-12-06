@@ -4,6 +4,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 
+	"github.com/bopher/utils"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -17,10 +18,10 @@ type ListerRequest struct {
 }
 
 // RequestResolver
-type RequestResolver func(lister Lister, data interface{}) bool
+type RequestResolver func(lister Lister, data interface{}) error
 
-// ListerRecordResolver fill lister from ListerRecord
-func ListerRecordResolver(lister Lister, data interface{}) bool {
+// RecordResolver fill lister from ListerRecord
+func RecordResolver(lister Lister, data interface{}) error {
 	if rec, ok := data.(ListerRequest); ok {
 		lister.SetPage(rec.Page)
 		lister.SetLimit(rec.Limit)
@@ -28,40 +29,46 @@ func ListerRecordResolver(lister Lister, data interface{}) bool {
 		lister.SetOrder(rec.Order)
 		lister.SetSearch(rec.Search)
 		lister.SetFilters(rec.Filters)
-		return true
+		return nil
 	}
-	return false
+	return utils.TaggedError([]string{"RecordResolver"}, "data is not valid!")
 }
 
 // Base64Resolver parse data from base64 encoded json string
-func Base64Resolver(lister Lister, data interface{}) bool {
+func Base64Resolver(lister Lister, data interface{}) error {
 	if qs, ok := data.(string); ok {
 		base64decoded := make([]byte, base64.StdEncoding.EncodedLen(len(qs)))
 		if _, err := base64.StdEncoding.Decode(base64decoded, []byte(qs)); err == nil {
 			return JsonStringResolver(lister, string(base64decoded))
+		} else {
+			return utils.TaggedError([]string{"Base64Resolver"}, err.Error())
 		}
 	}
-	return false
+	return utils.TaggedError([]string{"Base64Resolver"}, "data is not valid!")
 }
 
 // JsonStringResolver parse parameters from json string
-func JsonStringResolver(lister Lister, data interface{}) bool {
+func JsonStringResolver(lister Lister, data interface{}) error {
 	if qs, ok := data.(string); ok {
 		record := ListerRequest{}
 		if err := json.Unmarshal([]byte(qs), &record); err == nil {
-			return ListerRecordResolver(lister, record)
+			return RecordResolver(lister, record)
+		} else {
+			return utils.TaggedError([]string{"JsonStringResolver"}, err.Error())
 		}
 	}
-	return false
+	return utils.TaggedError([]string{"JsonStringResolver"}, "data is not valid!")
 }
 
 // FiberFormResolver parse parameters from fiber context
-func FiberFormResolver(lister Lister, data interface{}) bool {
+func FiberFormResolver(lister Lister, data interface{}) error {
 	if ctx, ok := data.(*fiber.Ctx); ok {
 		record := ListerRequest{}
 		if err := ctx.BodyParser(&record); err == nil {
-			return ListerRecordResolver(lister, record)
+			return RecordResolver(lister, record)
+		} else {
+			return utils.TaggedError([]string{"FiberFormResolver"}, err.Error())
 		}
 	}
-	return false
+	return utils.TaggedError([]string{"FiberFormResolver"}, "data is not valid!")
 }

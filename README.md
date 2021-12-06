@@ -1,6 +1,6 @@
 # Lister
 
-Lister helps parsing list request (page, limit, sort, order, filters) and generating paginator information.
+Lister helps parsing list request (page, limit, sort, order, filters).
 
 ## Requirements
 
@@ -8,9 +8,9 @@ Lister helps parsing list request (page, limit, sort, order, filters) and genera
 
 Request resolver is a function that parse lister fields from request (string, form, etc.). lister contains following resolver by default:
 
-**Note:** You can write your own resolver by implementing `func(lister Lister, data interface{}) bool` signature.
+**Note:** You can write your own resolver by implementing `func(lister Lister, data interface{}) error` signature.
 
-**ListerRecordResolver:** this resolver take ListRecord struct as input and parse to lister.
+**RecordResolver:** this resolver take ListRecord `struct` as input and parse to lister.
 
 **Base64Resolver:** this resolver parse lister fields from Base64 encoded json string.
 
@@ -22,16 +22,16 @@ Request resolver is a function that parse lister fields from request (string, fo
 
 ```json
 {
-    "page": 1,
-    "limit": 10,
-    "sort": "name",
-    "order": "asc",
-    "search": "john",
-    "filters": {
-        "minAge": 25,
-        "gender": "female",
-        "permissions": ["acc", "report"]
-    }
+  "page": 1,
+  "limit": 10,
+  "sort": "name",
+  "order": "asc",
+  "search": "john",
+  "filters": {
+    "minAge": 25,
+    "gender": "female",
+    "permissions": ["acc", "report"]
+  }
 }
 ```
 
@@ -41,8 +41,8 @@ Request resolver is a function that parse lister fields from request (string, fo
 import "github.com/bopher/lister"
 import "fmt"
 lst := lister.New()
-lst.SetValidLimits(10, 25, 50, 100)
-lst.SetValidSorts("_id", "name", "last_activity")
+lst.SetLimits(10, 25, 50, 100)
+lst.SetSorts("_id", "name", "last_activity")
 lister.JsonStringResolver(lst,`{"page": 2, "limit": 10}`)
 lst.SetTotal(/* Get Total Record Count From Somewhere */)
 // Do other operations, paginate and fetch record
@@ -58,35 +58,31 @@ Lister interface contains following methods:
 Set current page.
 
 ```go
-// Signature:
 SetPage(page uint)
 ```
 
-### GetPage
+### Page
 
 Get current page.
 
 ```go
-// Signature:
-GetPage() uint
+Page() uint
 ```
 
-### SetValidLimits
+### SetLimits
 
 Set valid limits list.
 
 ```go
-// Signature:
-SetValidLimits(limits ...uint)
+SetLimits(limits ...uint)
 ```
 
-### GetValidLimits
+### Limits
 
 Get valid limits.
 
 ```go
-// Signature:
-GetValidLimits() []uint
+Limits() []uint
 ```
 
 ### SetLimit
@@ -94,35 +90,31 @@ GetValidLimits() []uint
 Set limit.
 
 ```go
-// Signature:
 SetLimit(limit uint)
 ```
 
-### GetLimit
+### Limit
 
 Get limit.
 
 ```go
-// Signature:
-GetLimit() uint
+Limit() uint
 ```
 
-### SetValidSorts
+### SetSorts
 
 Set valid sorts list.
 
 ```go
-// Signature:
-SetValidSorts(sorts ...string)
+SetSorts(sorts ...string)
 ```
 
-### GetValidSort
+### Sorts
 
-Get valid sorts list.
+Get valid sorts.
 
 ```go
-// Signature:
-GetValidSort() []string
+Sorts() []string
 ```
 
 ### SetSort
@@ -130,44 +122,39 @@ GetValidSort() []string
 Set sort.
 
 ```go
-// Signature:
 SetSort(sort string)
 ```
 
-### GetSort
+### Sort
 
 Get sort.
 
 ```go
-// Signature:
-GetSort() string
+Sort() string
 ```
 
 ### SetOrder
 
-Set order. Valid values are `"asc"`, `"desc"`, `"1"`, `"-1"`, `1` and `-1`.
+Set order (valid values are `"asc"`, `"desc"`, `"1"`, `"-1"`, `1` and `-1`).
 
 ```go
-// Signature:
 SetOrder(order interface{})
 ```
 
-### GetOrder
+### Order
 
 Get order.
 
 ```go
-// Signature:
-GetOrder() string
+Order() string
 ```
 
-### GetNumericOrder
+### OrderNumeric
 
-Return order in numeric format (1 and -1).
+Return order in 1 and -1.
 
 ```go
-// Signature:
-GetNumericOrder() int8
+OrderNumeric() int8
 ```
 
 ### SetSearch
@@ -175,17 +162,15 @@ GetNumericOrder() int8
 Set search phrase.
 
 ```go
-// Signature:
 SetSearch(search string)
 ```
 
-### GetSearch
+### Search
 
 Get search phrase.
 
 ```go
-// Signature:
-GetSearch() string
+Search() string
 ```
 
 ### SetFilters
@@ -193,17 +178,15 @@ GetSearch() string
 Set filters list.
 
 ```go
-// Signature:
 SetFilters(filters map[string]interface{})
 ```
 
-### GetFilters
+### Filters
 
 Get filters list.
 
 ```go
-// Signature:
-GetFilters() map[string]interface{}
+Filters() map[string]interface{}
 ```
 
 ### SetFilter
@@ -214,13 +197,12 @@ Set filter.
 SetFilter(key string, value interface{})
 ```
 
-### GetFilter
+### Filter
 
 Get filter.
 
 ```go
-// Signature:
-GetFilter(key string) interface{}
+Filter(key string) interface{}
 ```
 
 ### HasFilter
@@ -228,33 +210,15 @@ GetFilter(key string) interface{}
 Check if filter exists.
 
 ```go
-// Signature:
 HasFilter(key string) bool
 ```
 
-### Get Filter By Type
+### CastFilter
 
-For getting filters with type you can use helper getter methods. getter methods accept a fallback value and returns fallback if value not exists or not in type. getter methods follow ok pattern. Getter methods list:
+Parse filter as caster.
 
 ```go
-// SliceFilter get slice filter or return fallback if filter not exists
-SliceFilter(key string, fallback []interface{}) ([]interface{}, bool)
-// StringFilter get string filter or return fallback if filter not exists
-StringFilter(key string, fallback string) (string, bool)
-// StringSliceFilter get string slice filter or return fallback if filter not exists
-StringSliceFilter(key string, fallback []string) ([]string, bool)
-// BoolFilter get bool filter or return fallback if filter not exists
-BoolFilter(key string, fallback bool) (bool, bool)
-// BoolSliceFilter get bool slice filter or return fallback if filter not exists
-BoolSliceFilter(key string, fallback []bool) ([]bool, bool)
-// Float64Filter get float64 filter or return fallback if filter not exists
-Float64Filter(key string, fallback float64) (float64, bool)
-// Float64SliceFilter get float64 slice filter or return fallback if filter not exists
-Float64SliceFilter(key string, fallback []float64) ([]float64, bool)
-// Int64Filter get int64 filter or return fallback if filter not exists
-Int64Filter(key string, fallback int64) (int64, bool)
-// Int64SliceFilter get int64 slice filter or return fallback if filter not exists
-Int64SliceFilter(key string, fallback []int64) ([]int64, bool)
+CastFilter(key string) caster.Caster
 ```
 
 ### SetMeta
@@ -262,17 +226,15 @@ Int64SliceFilter(key string, fallback []int64) ([]int64, bool)
 Set meta data.
 
 ```go
-// Signature:
 SetMeta(key string, value interface{})
 ```
 
-### GetMeta
+### Meta
 
 Get meta.
 
 ```go
-// Signature:
-GetMeta(key string) interface{}
+Meta(key string) interface{}
 ```
 
 ### HasMeta
@@ -280,8 +242,15 @@ GetMeta(key string) interface{}
 Check if meta exists.
 
 ```go
-// Signature:
 HasMeta(key string) bool
+```
+
+### CastMeta
+
+Parse meta as caster.
+
+```go
+CastMeta(key string) caster.Caster
 ```
 
 ### MetaData
@@ -289,33 +258,7 @@ HasMeta(key string) bool
 Get meta data list.
 
 ```go
-// Signature:
 MetaData() map[string]interface{}
-```
-
-### Get Meta By Type
-
-For getting meta with type you can use helper getter methods. getter methods accept a fallback value and returns fallback if value not exists or not in type. getter methods follow ok pattern. Getter methods list:
-
-```go
-// SliceMeta get slice meta or return fallback if meta not exists
-SliceMeta(key string, fallback []interface{}) ([]interface{}, bool)
-// StringMeta get string meta or return fallback if meta not exists
-StringMeta(key string, fallback string) (string, bool)
-// StringSliceMeta get string slice slice meta or return fallback if meta not exists
-StringSliceMeta(key string, fallback []string) ([]string, bool)
-// BoolMeta get bool meta or return fallback if meta not exists
-BoolMeta(key string, fallback bool) (bool, bool)
-// BoolSliceMeta get bool slice meta or return fallback if meta not exists
-BoolSliceMeta(key string, fallback []bool) ([]bool, bool)
-// Float64Meta get float64 meta or return fallback if meta not exists
-Float64Meta(key string, fallback float64) (float64, bool)
-// Float64SliceMeta get float64 slice meta or return fallback if meta not exists
-Float64SliceMeta(key string, fallback []float64) ([]float64, bool)
-// Int64Meta get int64 meta or return fallback if meta not exists
-Int64Meta(key string, fallback int64) (int64, bool)
-// Int64SliceMeta get int64 slice meta or return fallback if meta not exists
-Int64SliceMeta(key string, fallback []int64) ([]int64, bool)
 ```
 
 ### SetTotal
@@ -325,17 +268,15 @@ Set total records count. You must pass total records count to this method for ge
 **Caution:** Call this method after setting all lister fields(page, limits, etc).
 
 ```go
-// Signature:
 SetTotal(total uint64)
 ```
 
-### GetTotal
+### Total
 
 Get total records count.
 
 ```go
-// Signature:
-GetTotal() uint64
+Total() uint64
 ```
 
 ### From
@@ -343,7 +284,6 @@ GetTotal() uint64
 Get from record position.
 
 ```go
-// Signature:
 From() uint64
 ```
 
@@ -352,7 +292,6 @@ From() uint64
 Get to record position.
 
 ```go
-// Signature:
 To() uint64
 ```
 
@@ -361,7 +300,6 @@ To() uint64
 Get total pages count.
 
 ```go
-// Signature:
 Pages() uint
 ```
 
@@ -370,15 +308,13 @@ Pages() uint
 Get response for json, contains pagination information and meta data.
 
 ```go
-// Signature:
 Response() map[string]interface{}
 ```
 
 ### ResponseWithData
 
-return response with data field.
+Return response with data.
 
 ```go
-// Signature:
 ResponseWithData(data interface{}) map[string]interface{}
 ```

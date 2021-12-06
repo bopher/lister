@@ -1,7 +1,7 @@
 package lister
 
 func New() Lister {
-	l := new(lister)
+	l := new(lDriver)
 	l.init()
 	return l
 }

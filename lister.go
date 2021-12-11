@@ -65,6 +65,8 @@ type Lister interface {
 	To() uint64
 	// Pages get total pages count
 	Pages() uint
+	// SQLSortOrder get sql order and limit command as string
+	SQLSortOrder() string
 	// Response get response for json, contains pagination information and meta data
 	Response() map[string]interface{}
 	// ResponseWithData return response with data

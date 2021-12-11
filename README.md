@@ -303,6 +303,14 @@ Get total pages count.
 Pages() uint
 ```
 
+### SQLSortOrder
+
+Get sql order and limit command as string.
+
+```go
+SQLSortOrder() string
+```
+
 ### Response
 
 Get response for json, contains pagination information and meta data.

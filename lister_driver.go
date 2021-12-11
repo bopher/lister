@@ -211,6 +211,10 @@ func (this lDriver) Pages() uint {
 	return this.pagesCount
 }
 
+func (this lDriver) SQLSortOrder() string {
+	return fmt.Sprintf(" ORDER BY %s %s LIMIT %d, %d", this.sort, this.order, this.from-1, this.limit)
+}
+
 func (this lDriver) Response() map[string]interface{} {
 	res := make(map[string]interface{})
 	for k, v := range this.meta {

@@ -8,7 +8,7 @@ Lister helps parsing list request (page, limit, sort, order, filters).
 
 Request resolver is a function that parse lister fields from request (string, form, etc.). lister contains following resolver by default:
 
-**Note:** You can write your own resolver by implementing `func(lister Lister, data interface{}) error` signature.
+**Note:** You can write your own resolver by implementing `func(lister Lister, data any) error` signature.
 
 **RecordResolver:** this resolver take ListRecord `struct` as input and parse to lister.
 
@@ -138,7 +138,7 @@ Sort() string
 Set order (valid values are `"asc"`, `"desc"`, `"1"`, `"-1"`, `1` and `-1`).
 
 ```go
-SetOrder(order interface{})
+SetOrder(order any)
 ```
 
 ### Order
@@ -178,7 +178,7 @@ Search() string
 Set filters list.
 
 ```go
-SetFilters(filters map[string]interface{})
+SetFilters(filters map[string]any)
 ```
 
 ### Filters
@@ -186,7 +186,7 @@ SetFilters(filters map[string]interface{})
 Get filters list.
 
 ```go
-Filters() map[string]interface{}
+Filters() map[string]any
 ```
 
 ### SetFilter
@@ -194,7 +194,7 @@ Filters() map[string]interface{}
 Set filter.
 
 ```go
-SetFilter(key string, value interface{})
+SetFilter(key string, value any)
 ```
 
 ### Filter
@@ -202,7 +202,7 @@ SetFilter(key string, value interface{})
 Get filter.
 
 ```go
-Filter(key string) interface{}
+Filter(key string) any
 ```
 
 ### HasFilter
@@ -226,7 +226,7 @@ CastFilter(key string) caster.Caster
 Set meta data.
 
 ```go
-SetMeta(key string, value interface{})
+SetMeta(key string, value any)
 ```
 
 ### Meta
@@ -234,7 +234,7 @@ SetMeta(key string, value interface{})
 Get meta.
 
 ```go
-Meta(key string) interface{}
+Meta(key string) any
 ```
 
 ### HasMeta
@@ -258,7 +258,7 @@ CastMeta(key string) caster.Caster
 Get meta data list.
 
 ```go
-MetaData() map[string]interface{}
+MetaData() map[string]any
 ```
 
 ### SetTotal
@@ -316,7 +316,7 @@ SQLSortOrder() string
 Get response for json, contains pagination information and meta data.
 
 ```go
-Response() map[string]interface{}
+Response() map[string]any
 ```
 
 ### ResponseWithData
@@ -324,5 +324,5 @@ Response() map[string]interface{}
 Return response with data.
 
 ```go
-ResponseWithData(data interface{}) map[string]interface{}
+ResponseWithData(data any) map[string]any
 ```

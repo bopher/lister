@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/bopher/caster"
+	"github.com/bopher/utils"
 )
 
 type lDriver struct {
@@ -14,11 +15,11 @@ type lDriver struct {
 	sort    string
 	order   string
 	search  string
-	filters map[string]interface{}
+	filters map[string]any
 
 	limits []uint
 	sorts  []string
-	meta   map[string]interface{}
+	meta   map[string]any
 
 	total      uint64
 	from       uint64
@@ -26,76 +27,72 @@ type lDriver struct {
 	pagesCount uint
 }
 
-func (this *lDriver) init() {
-	this.page = 1
-	this.limit = 25
-	this.sort = "_id"
-	this.order = "asc"
-	this.filters = make(map[string]interface{})
-	this.limits = []uint{10, 25, 50, 100, 250}
-	this.sorts = []string{"_id"}
-	this.meta = make(map[string]interface{})
+func (ld *lDriver) init() {
+	ld.page = 1
+	ld.limit = 25
+	ld.sort = "_id"
+	ld.order = "asc"
+	ld.filters = make(map[string]any)
+	ld.limits = []uint{10, 25, 50, 100, 250}
+	ld.sorts = []string{"_id"}
+	ld.meta = make(map[string]any)
 }
 
-func (this *lDriver) SetPage(page uint) {
+func (ld *lDriver) SetPage(page uint) {
 	if page > 0 {
-		if this.pagesCount > 0 && page > this.pagesCount {
-			this.page = this.pagesCount
+		if ld.pagesCount > 0 && page > ld.pagesCount {
+			ld.page = ld.pagesCount
 			return
 		}
-		this.page = page
+		ld.page = page
 	}
 }
 
-func (this lDriver) Page() uint {
-	return this.page
+func (ld lDriver) Page() uint {
+	return ld.page
 }
 
-func (this *lDriver) SetLimits(limits ...uint) {
+func (ld *lDriver) SetLimits(limits ...uint) {
 	if len(limits) > 0 {
-		this.limits = limits
+		ld.limits = limits
 	}
 }
 
-func (this lDriver) Limits() []uint {
-	return this.limits
+func (ld lDriver) Limits() []uint {
+	return ld.limits
 }
 
-func (this *lDriver) SetLimit(limit uint) {
-	for _, l := range this.limits {
-		if l == limit {
-			this.limit = limit
-		}
+func (ld *lDriver) SetLimit(limit uint) {
+	if utils.Contains[uint](ld.limits, limit) {
+		ld.limit = limit
 	}
 }
 
-func (this lDriver) Limit() uint {
-	return this.limit
+func (ld lDriver) Limit() uint {
+	return ld.limit
 }
 
-func (this *lDriver) SetSorts(sorts ...string) {
+func (ld *lDriver) SetSorts(sorts ...string) {
 	if len(sorts) > 0 {
-		this.sorts = sorts
+		ld.sorts = sorts
 	}
 }
 
-func (this lDriver) Sorts() []string {
-	return this.sorts
+func (ld lDriver) Sorts() []string {
+	return ld.sorts
 }
 
-func (this *lDriver) SetSort(sort string) {
-	for _, s := range this.sorts {
-		if s == sort {
-			this.sort = sort
-		}
+func (ld *lDriver) SetSort(sort string) {
+	if utils.Contains[string](ld.sorts, sort) {
+		ld.sort = sort
 	}
 }
 
-func (this lDriver) Sort() string {
-	return this.sort
+func (ld lDriver) Sort() string {
+	return ld.sort
 }
 
-func (this *lDriver) SetOrder(order interface{}) {
+func (ld *lDriver) SetOrder(order any) {
 	o := strings.ToLower(fmt.Sprint(order))
 	if o == "-1" {
 		o = "desc"
@@ -104,148 +101,148 @@ func (this *lDriver) SetOrder(order interface{}) {
 		o = "asc"
 	}
 	if o == "asc" || o == "desc" {
-		this.order = o
+		ld.order = o
 	}
 }
 
-func (this lDriver) Order() string {
-	return this.order
+func (ld lDriver) Order() string {
+	return ld.order
 }
 
-func (this lDriver) OrderNumeric() int8 {
-	if this.order == "desc" {
+func (ld lDriver) OrderNumeric() int8 {
+	if ld.order == "desc" {
 		return -1
 	}
 	return 1
 }
 
-func (this *lDriver) SetSearch(search string) {
-	this.search = search
+func (ld *lDriver) SetSearch(search string) {
+	ld.search = search
 }
 
-func (this lDriver) Search() string {
-	return this.search
+func (ld lDriver) Search() string {
+	return ld.search
 }
 
-func (this *lDriver) SetFilters(filters map[string]interface{}) {
+func (ld *lDriver) SetFilters(filters map[string]any) {
 	if filters != nil {
-		this.filters = filters
+		ld.filters = filters
 	} else {
-		this.filters = make(map[string]interface{})
+		ld.filters = make(map[string]any)
 	}
 }
 
-func (this lDriver) Filters() map[string]interface{} {
-	return this.filters
+func (ld lDriver) Filters() map[string]any {
+	return ld.filters
 }
 
-func (this *lDriver) SetFilter(key string, value interface{}) {
-	this.filters[key] = value
+func (ld *lDriver) SetFilter(key string, value any) {
+	ld.filters[key] = value
 }
 
-func (this lDriver) Filter(key string) interface{} {
-	return this.filters[key]
+func (ld lDriver) Filter(key string) any {
+	return ld.filters[key]
 }
 
-func (this lDriver) HasFilter(key string) bool {
-	_, exists := this.filters[key]
+func (ld lDriver) HasFilter(key string) bool {
+	_, exists := ld.filters[key]
 	return exists
 }
 
-func (this lDriver) CastFilter(key string) caster.Caster {
-	return caster.NewCaster(this.filters[key])
+func (ld lDriver) CastFilter(key string) caster.Caster {
+	return caster.NewCaster(ld.filters[key])
 }
 
-func (this *lDriver) SetMeta(key string, value interface{}) {
-	this.meta[key] = value
+func (ld *lDriver) SetMeta(key string, value any) {
+	ld.meta[key] = value
 }
 
-func (this lDriver) Meta(key string) interface{} {
-	return this.meta[key]
+func (ld lDriver) Meta(key string) any {
+	return ld.meta[key]
 }
 
-func (this lDriver) HasMeta(key string) bool {
-	_, exists := this.meta[key]
+func (ld lDriver) HasMeta(key string) bool {
+	_, exists := ld.meta[key]
 	return exists
 }
 
-func (this lDriver) MetaData() map[string]interface{} {
-	return this.meta
+func (ld lDriver) MetaData() map[string]any {
+	return ld.meta
 }
 
-func (this lDriver) CastMeta(key string) caster.Caster {
-	return caster.NewCaster(this.meta[key])
+func (ld lDriver) CastMeta(key string) caster.Caster {
+	return caster.NewCaster(ld.meta[key])
 }
 
-func (this *lDriver) SetTotal(total uint64) {
-	this.total = total
-	this.pagesCount = uint(math.Ceil(float64(this.total) / float64(this.limit)))
-	if this.page > this.pagesCount {
-		this.page = this.pagesCount
+func (ld *lDriver) SetTotal(total uint64) {
+	ld.total = total
+	ld.pagesCount = uint(math.Ceil(float64(ld.total) / float64(ld.limit)))
+	if ld.page > ld.pagesCount {
+		ld.page = ld.pagesCount
 	}
-	if this.page < 1 {
-		this.page = 1
+	if ld.page < 1 {
+		ld.page = 1
 	}
 
-	this.from = (uint64(this.page-1) * uint64(this.limit))
+	ld.from = (uint64(ld.page-1) * uint64(ld.limit))
 
-	this.to = this.from + uint64(this.limit)
-	if this.to > total {
-		this.to = total
+	ld.to = ld.from + uint64(ld.limit)
+	if ld.to > total {
+		ld.to = total
 	}
 }
 
-func (this lDriver) Total() uint64 {
-	return this.total
+func (ld lDriver) Total() uint64 {
+	return ld.total
 }
 
-func (this lDriver) From() uint64 {
-	return this.from
+func (ld lDriver) From() uint64 {
+	return ld.from
 }
 
-func (this lDriver) To() uint64 {
-	return this.to
+func (ld lDriver) To() uint64 {
+	return ld.to
 }
 
-func (this lDriver) Pages() uint {
-	return this.pagesCount
+func (ld lDriver) Pages() uint {
+	return ld.pagesCount
 }
 
-func (this lDriver) SQLSortOrder() string {
-	return fmt.Sprintf(" ORDER BY %s %s LIMIT %d, %d", this.sort, this.order, this.from-1, this.limit)
+func (ld lDriver) SQLSortOrder() string {
+	return fmt.Sprintf(" ORDER BY %s %s LIMIT %d, %d", ld.sort, ld.order, ld.from-1, ld.limit)
 }
 
-func (this lDriver) Response() map[string]interface{} {
-	res := make(map[string]interface{})
-	for k, v := range this.meta {
+func (ld lDriver) Response() map[string]any {
+	res := make(map[string]any)
+	for k, v := range ld.meta {
 		res[k] = v
 	}
-	res["page"] = this.page
-	res["limit"] = this.limit
-	res["sort"] = this.sort
-	res["order"] = this.order
-	res["search"] = this.search
-	res["total"] = this.total
-	res["from"] = this.from + 1
-	res["to"] = this.to
-	res["pages"] = this.pagesCount
+	res["page"] = ld.page
+	res["limit"] = ld.limit
+	res["sort"] = ld.sort
+	res["order"] = ld.order
+	res["search"] = ld.search
+	res["total"] = ld.total
+	res["from"] = ld.from + 1
+	res["to"] = ld.to
+	res["pages"] = ld.pagesCount
 	return res
 }
 
-func (this lDriver) ResponseWithData(data interface{}) map[string]interface{} {
-	res := make(map[string]interface{})
-	for k, v := range this.meta {
+func (ld lDriver) ResponseWithData(data any) map[string]any {
+	res := make(map[string]any)
+	for k, v := range ld.meta {
 		res[k] = v
 	}
-	res["page"] = this.page
-	res["limit"] = this.limit
-	res["sort"] = this.sort
-	res["order"] = this.order
-	res["search"] = this.search
-	res["total"] = this.total
-	res["from"] = this.from + 1
-	res["to"] = this.to
-	res["pages"] = this.pagesCount
+	res["page"] = ld.page
+	res["limit"] = ld.limit
+	res["sort"] = ld.sort
+	res["order"] = ld.order
+	res["search"] = ld.search
+	res["total"] = ld.total
+	res["from"] = ld.from + 1
+	res["to"] = ld.to
+	res["pages"] = ld.pagesCount
 	res["data"] = data
 	return res
 }

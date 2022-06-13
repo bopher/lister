@@ -15,7 +15,7 @@ func TestRecordResolver(t *testing.T) {
 		Sort:   "title",
 		Order:  "desc",
 		Search: "John",
-		Filters: map[string]interface{}{
+		Filters: map[string]any{
 			"username": "JackMa",
 		},
 	})
